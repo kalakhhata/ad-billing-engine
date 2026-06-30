@@ -1,0 +1,58 @@
+spring:
+  application:
+    name: billing-engine
+  kafka:
+    bootstrap-servers: ${SPRING_KAFKA_BOOTSTRAP_SERVERS:localhost:9092}
+    consumer:
+      group-id: billing-engine-group
+      auto-offset-reset: earliest
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      max-poll-records: 500
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.apache.kafka.common.serialization.StringSerializer
+  datasource:
+    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5432/billing}
+    username: ${SPRING_DATASOURCE_USERNAME:billing}
+    password: ${SPRING_DATASOURCE_PASSWORD:billing_secret}
+    hikari:
+      maximum-pool-size: 20
+      connection-timeout: 5000
+  jpa:
+    hibernate:
+      ddl-auto: none
+    show-sql: false
+  data:
+    redis:
+      host: ${SPRING_REDIS_HOST:localhost}
+      port: ${SPRING_REDIS_PORT:6379}
+
+grpc:
+  client:
+    balance-service:
+      address: static://${BALANCE_SERVICE_HOST:localhost}:${BALANCE_SERVICE_PORT:9090}
+      negotiation-type: plaintext
+
+billing:
+  kafka:
+    topics:
+      ad-events: ad-events
+      dlq: ad-events-dlq
+  retry:
+    max-attempts: 3
+    initial-backoff-ms: 500
+    backoff-multiplier: 2.0
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics
+
+server:
+  port: 8080
+
+logging:
+  level:
+    com.adbilling: DEBUG

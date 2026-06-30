@@ -1,0 +1,27 @@
+spring:
+  application:
+    name: account-balance-service
+  data:
+    redis:
+      host: ${SPRING_REDIS_HOST:localhost}
+      port: ${SPRING_REDIS_PORT:6379}
+      timeout: 2000ms
+
+grpc:
+  server:
+    port: ${GRPC_PORT:9090}
+    security:
+      enabled: false
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics
+  server:
+    port: 8081
+
+logging:
+  level:
+    com.adbilling: DEBUG
+    io.grpc: INFO

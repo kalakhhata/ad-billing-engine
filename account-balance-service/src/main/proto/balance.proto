@@ -1,0 +1,60 @@
+syntax = "proto3";
+
+package billing.balance.v1;
+
+option java_multiple_files = true;
+option java_package = "com.adbilling.balance.grpc";
+option java_outer_classname = "BalanceServiceProto";
+
+// AccountBalanceService owns advertiser balances.
+// All amounts are in micro-dollars (1 USD = 1,000,000 micros) to avoid
+// floating-point rounding errors — a common source of billing bugs.
+service AccountBalanceService {
+  // CheckBalance returns the current balance for an advertiser.
+  rpc CheckBalance (CheckBalanceRequest) returns (CheckBalanceResponse);
+
+  // DeductFunds atomically deducts the requested amount.
+  // Uses a Redis Lua script so check-and-deduct is a single atomic operation.
+  rpc DeductFunds (DeductFundsRequest) returns (DeductFundsResponse);
+
+  // SeedBalance sets an advertiser's balance (used by load-test setup).
+  rpc SeedBalance (SeedBalanceRequest) returns (SeedBalanceResponse);
+}
+
+message CheckBalanceRequest {
+  string advertiser_id = 1;
+}
+
+message CheckBalanceResponse {
+  string advertiser_id = 1;
+  int64  balance_micros = 2;
+}
+
+message DeductFundsRequest {
+  string advertiser_id = 1;
+  int64  amount_micros = 2;
+  string idempotency_key = 3;   // event_id — prevents double-deduction at the balance layer too
+}
+
+enum DeductFundsStatus {
+  SUCCESS             = 0;
+  INSUFFICIENT_FUNDS  = 1;
+  ADVERTISER_NOT_FOUND = 2;
+  ALREADY_PROCESSED   = 3;     // idempotency hit at balance layer
+}
+
+message DeductFundsResponse {
+  DeductFundsStatus status         = 1;
+  int64             balance_after  = 2;
+  string            message        = 3;
+}
+
+message SeedBalanceRequest {
+  string advertiser_id    = 1;
+  int64  balance_micros   = 2;
+}
+
+message SeedBalanceResponse {
+  bool   success = 1;
+  string message = 2;
+}
