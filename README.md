@@ -162,16 +162,16 @@ Results are saved as JSON to `load-test/load-test-results/run_<timestamp>.json` 
 
 | Metric | Result |
 |---|---|
-| Target rate | _events/s |
-| Actual throughput | _events/s |
-| Duration | _s |
-| Total processed | _ |
-| SUCCESS | _ |
-| REJECTED (budget) | _ |
-| DLQ (max retries) | _ |
-| Duplicate leakage | 0 (idempotency held) |
-| Cost p50 | _ micros |
-| Cost p95 | _ micros |
+| Target rate | 500 events/s |
+| Actual throughput | 408 events/s |
+| Duration | 60s |
+| Total processed | 24,484 |
+| SUCCESS | 24,484 |
+| REJECTED (budget) | 0 |
+| DLQ (max retries) | 0 |
+| Duplicate leakage | 0 ✅ (1,318 duplicates sent, none double-processed) |
+| Cost p50 | 52,189 micros ($0.05) |
+| Cost p95 | 454,061 micros ($0.45) |
 
 **How to run and record:**
 ```bash
